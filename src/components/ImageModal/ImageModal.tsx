@@ -1,13 +1,46 @@
-import ReactModal from "react-modal";
 import { useEffect } from "react";
+import ReactModal from "react-modal";
 import styles from "./ImageModal.module.css";
 
-const ImageModal = ({ isOpen, onClose, image, onNext, onPrev }) => {
-  useEffect(() => {
-    ReactModal.setAppElement("#root");
-  }, []);
+type Image = {
+  id: string;
+  urls: {
+    regular: string;
+  };
+  alt_description?: string;
+  user: {
+    name: string;
+  };
+  likes: number;
+};
 
-  const handleOverlayClick = (e) => {
+type ImageModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  image: Image;
+  onNext: () => void;
+  onPrev: () => void;
+  isNextDisabled: boolean;
+  isPrevDisabled: boolean;
+};
+
+const ImageModal = ({
+  isOpen,
+  onClose,
+  image,
+  onNext,
+  onPrev,
+  isNextDisabled,
+  isPrevDisabled,
+}: ImageModalProps): JSX.Element => {
+  useEffect(() => {
+    if (isOpen) {
+      // Якщо модальне вікно відкривається, встановлюємо appElement
+      ReactModal.setAppElement("#root");
+    }
+  }, [isOpen]); // Залежність на isOpen, щоб тільки при відкритті модального вікна відбувався виклик
+
+  const handleOverlayClick = (e: React.MouseEvent): void => {
     if (e.target === e.currentTarget) {
       onClose();
     }
@@ -26,6 +59,7 @@ const ImageModal = ({ isOpen, onClose, image, onNext, onPrev }) => {
           <button
             onClick={onPrev}
             className={`${styles.navigationButton} ${styles.previousButton}`}
+            disabled={isPrevDisabled}
           >
             Back
           </button>
@@ -37,6 +71,7 @@ const ImageModal = ({ isOpen, onClose, image, onNext, onPrev }) => {
           <button
             onClick={onNext}
             className={`${styles.navigationButton} ${styles.nextButton}`}
+            disabled={isNextDisabled}
           >
             Next
           </button>

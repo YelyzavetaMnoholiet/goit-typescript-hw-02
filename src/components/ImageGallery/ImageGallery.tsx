@@ -1,7 +1,16 @@
 import ImageCard from "./ImageCard";
+import { Image } from "../App";
 import styles from "./ImageGallery.module.css";
 
-const ImageGallery = ({ images, onImageClick }) => {
+type ImageGalleryProps = {
+  images: Image[];
+  onImageClick: (image: Image, index: number) => void;
+};
+
+const ImageGallery = ({
+  images,
+  onImageClick,
+}: ImageGalleryProps): JSX.Element => {
   return (
     <ul className={styles.gallery}>
       {images.map((image, index) => (

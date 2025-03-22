@@ -8,19 +8,33 @@ import Loader from "./Loader/Loader";
 import LoadMoreBtn from "./LoadMoreBtn/LoadMoreBtn";
 import { API_KEY } from "../config/config";
 import styles from "./App.module.css";
+import Modal from "react-modal";
 
-const App = () => {
-  const [images, setImages] = useState([]);
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(null);
+export type Image = {
+  id: string;
+  urls: {
+    small: string;
+    regular: string;
+  };
+  alt_description?: string;
+  user: {
+    name: string;
+  };
+  likes: number;
+};
+
+const App = (): JSX.Element => {
+  const [images, setImages] = useState<Image[]>([]);
+  const [query, setQuery] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<Image | null>(null);
+  const [currentIndex, setCurrentIndex] = useState<number | null>(null);
 
   const BASE_URL = "https://api.unsplash.com/search/photos";
 
-  const fetchImages = async () => {
+  const fetchImages = async (): Promise<void> => {
     try {
       setIsLoading(true);
       const { data } = await axios.get(BASE_URL, {
@@ -41,35 +55,40 @@ const App = () => {
     fetchImages();
   }, [query, page]);
 
-  const handleSearch = (newQuery) => {
+  // Виклик setAppElement в App.tsx
+  useEffect(() => {
+    Modal.setAppElement("#root");
+  }, []);
+
+  const handleSearch = (newQuery: string): void => {
     setQuery(newQuery);
     setImages([]);
     setPage(1);
     setError(null);
   };
 
-  const handleLoadMore = () => setPage((prev) => prev + 1);
+  const handleLoadMore = (): void => setPage((prev) => prev + 1);
 
-  const handleImageClick = (image, index) => {
+  const handleImageClick = (image: Image, index: number): void => {
     setSelectedImage(image);
     setCurrentIndex(index);
   };
 
-  const closeModal = () => {
+  const closeModal = (): void => {
     setSelectedImage(null);
     setCurrentIndex(null);
   };
 
-  const handleNextImage = () => {
-    if (currentIndex < images.length - 1) {
-      setCurrentIndex((prevIndex) => prevIndex + 1);
+  const handleNextImage = (): void => {
+    if (currentIndex !== null && currentIndex < images.length - 1) {
+      setCurrentIndex((prevIndex) => (prevIndex !== null ? prevIndex + 1 : 0));
       setSelectedImage(images[currentIndex + 1]);
     }
   };
 
-  const handlePrevImage = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prevIndex) => prevIndex - 1);
+  const handlePrevImage = (): void => {
+    if (currentIndex !== null && currentIndex > 0) {
+      setCurrentIndex((prevIndex) => (prevIndex !== null ? prevIndex - 1 : 0));
       setSelectedImage(images[currentIndex - 1]);
     }
   };
